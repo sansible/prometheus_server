@@ -1,0 +1,38 @@
+---
+
+- name: Set Prometheus Server system defaults
+  become: yes
+  template:
+    dest: /etc/default/prometheus-server
+    mode: 0644
+    src: prometheus_server.default.j2
+
+- name: Get list of rule files
+  become: yes
+  become_user: "{{ prometheus_server.user }}"
+  find:
+    path: "{{ prometheus_server.path.rule }}"
+    patterns: "*.rules"
+  register: rules_list
+
+- name: Get list of service discovery configuration files
+  become: yes
+  become_user: "{{ prometheus_server.user }}"
+  find:
+    path: "{{ prometheus_server.path.sd }}"
+    patterns: "*.json,*.yml,*.yaml"
+  register: sd_list
+
+- name: Create Prometheus Server main config file
+  become: yes
+  become_user: "{{ prometheus_server.user }}"
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_server.path.config }}/prometheus.yml"
+    validate: "{{ prometheus_server.path.install }}/prometheus/promtool check-config %s"
+
+- name: Start Prometheus Server
+  become: yes
+  service:
+    name: prometheus-server
+    state: started

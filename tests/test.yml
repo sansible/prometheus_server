@@ -1,0 +1,50 @@
+---
+
+- name: Test Prometheus role
+  hosts: all
+
+  pre_tasks:
+    - name: Update apt
+      become: yes
+      apt:
+        cache_valid_time: 1800
+        update_cache: yes
+      tags:
+        - build
+
+    - name: Copy test rule file to Prometheus server
+      become: yes
+      become_user: "{{ prometheus_server.user }}"
+      copy:
+        src: tests/test.rules
+        dest: "{{ prometheus_server.path.rule }}/test.rules"
+        validate: "{{ prometheus_server.path.install }}/prometheus/promtool check-rules %s"
+      with_dict: '{{ prometheus_server.rules | default({}) }}'
+      tags:
+        - build
+
+  roles:
+    - role: sansible.prometheus_server
+      prometheus:
+        rules:
+          test_rule:
+            src:  tests/test.rules
+            dest: test.rules
+
+  post_tasks:
+    - name: Get Prometheus service state
+      become: yes
+      service:
+        name: prometheus-server
+        state: started
+      register: status
+      tags:
+        - assert
+
+    - name: Assert that Prometheus has been running
+      assert:
+        that:
+          - "false == status.changed"
+          - "'started' == status.state"
+      tags:
+        - assert
