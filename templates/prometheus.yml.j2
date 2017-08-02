@@ -1,0 +1,33 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: '{{ prometheus_server.environment }}'
+
+{% if rules_list.matched > 0 %}
+rule_files:
+  {% for file in rules_list.files %}
+  - {{ file.path }}
+  {% endfor %}
+{% endif %}
+
+scrape_configs:
+  # Static scrape of Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+{% if sd_list.matched > 0 %}
+  # Service discovery configuration
+  - job_name: "service_discovery"
+    file_sd_configs:
+      - files:
+  {% for file in sd_list.files %}
+        - {{ file.path }}
+  {% endfor %}
+{% endif %}

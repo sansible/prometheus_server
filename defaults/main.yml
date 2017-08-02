@@ -1,0 +1,20 @@
+---
+
+prometheus_server:
+  alertmanager:
+    url: ~
+  checksum: sha256:4779d5cf08c50ed368a57b102ab3895e5e830d6b355ca4bfecf718a034a164e0
+  download_dest: /tmp
+  download_url: https://github.com/prometheus/prometheus/releases/download/v1.7.1/prometheus-1.7.1.linux-amd64.tar.gz
+  environment: dev
+  group: prometheus
+  opts: ~
+  path:
+    config: /home/prometheus/config
+    data: /home/prometheus/data
+    install: /home/prometheus
+    log: /home/prometheus/log
+    pid: /home/prometheus/run
+    rule: /home/prometheus/rules
+    sd: /home/prometheus/tgroups
+  user: prometheus

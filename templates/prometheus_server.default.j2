@@ -1,0 +1,12 @@
+CONFIG={{ prometheus_server.path.config }}/prometheus.yml
+{% if prometheus_server.alertmanager.url is defined and prometheus_server.alertmanager.url != None %}
+ALERTMANAGER_OPTS="-alertmanager.url={{ prometheus_server.alertmanager.url }}"
+{% else %}
+ALERTMANAGER_OPTS=
+{% endif %}
+DAEMON_ARGS="$ALERTMANAGER_OPTS"
+DAEMON_ARGS="$DAEMON_ARGS -config.file=$CONFIG -storage.local.path={{ prometheus_server.path.data }}"
+DAEMON_ARGS="$DAEMON_ARGS -web.console.templates={{ prometheus_server.path.install }}/consoles -web.console.libraries={{ prometheus_server.path.install }}/console_libraries"
+{% if prometheus_server.opts is defined and prometheus_server.opts != None %}
+DAEMON_ARGS="$DAEMON_ARGS {{ prometheus_server.opts }}"
+{% endif %}
