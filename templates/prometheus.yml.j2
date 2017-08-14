@@ -22,12 +22,8 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-{% if sd_list.matched > 0 %}
   # Service discovery configuration
   - job_name: "service_discovery"
     file_sd_configs:
       - files:
-  {% for file in sd_list.files %}
-        - {{ file.path }}
-  {% endfor %}
-{% endif %}
+        - {{ prometheus_server.path.sd }}/*.json
