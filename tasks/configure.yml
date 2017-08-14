@@ -15,14 +15,6 @@
     patterns: "*.rules"
   register: rules_list
 
-- name: Get list of service discovery configuration files
-  become: yes
-  become_user: "{{ prometheus_server.user }}"
-  find:
-    path: "{{ prometheus_server.path.sd }}"
-    patterns: "*.json,*.yml,*.yaml"
-  register: sd_list
-
 - name: Create Prometheus Server main config file
   become: yes
   become_user: "{{ prometheus_server.user }}"
