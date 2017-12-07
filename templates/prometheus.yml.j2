@@ -9,12 +9,8 @@ global:
   external_labels:
       monitor: '{{ prometheus_server.environment }}'
 
-{% if rules_list.matched > 0 %}
 rule_files:
-  {% for file in rules_list.files %}
-  - {{ file.path }}
-  {% endfor %}
-{% endif %}
+  - {{ prometheus_server.path.rule }}/*.rules
 
 scrape_configs:
   # Static scrape of Prometheus itself
